@@ -19,7 +19,7 @@ def escreve_no_ficheiro (file, content):
 
 #---------------------------------------Script Principal-------------------------------------------------#
 
-reparacoes = abrir_json("/home/luis/EW/EngWeb2026/TP1/dataset_reparacoes.json")
+reparacoes = abrir_json("dataset_reparacoes.json")
 
 indice = f'''
 <html>
