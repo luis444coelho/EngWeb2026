@@ -269,3 +269,52 @@ for intervencao in intervencoes_ordenadas:
     escreve_no_ficheiro(f"./output/intervencao/{intervencao['codigo']}.html", html_intervencao)
 
 #------------------- Listagem das marcas e modelos dos carros intervencionados -------------------------------
+
+contagem = {}
+
+for reparacao in reparacoes["reparacoes"]:
+    marca = reparacao.get("viatura", {}).get("marca", "")
+    modelo = reparacao.get("viatura", {}).get("modelo", "")
+    chave = (marca, modelo)
+    if chave not in contagem:
+        contagem[chave] = 0
+    contagem[chave] += 1
+
+lista_marcas_modelos = ""
+
+lista_ordenada_alfabeticamente = sorted(
+    contagem.items(),
+    key=lambda item: (item[0][0].lower(), item[0][1].lower())
+)
+
+for (marca, modelo), quantidade in lista_ordenada_alfabeticamente:
+    lista_marcas_modelos += f'''
+            <tr>
+                <td>{marca}</td>
+                <td>{modelo}</td>
+                <td>{quantidade}</td>
+            </tr>
+            '''
+
+html_marcas_modelos = f'''
+<html>
+    <head>
+        <title>Marcas e Modelos</title>
+        <meta charset="utf-8"/>
+    </head>
+    <body>
+        <h3>Marcas e Modelos dos Carros Intervencionados</h3>
+        <table border="1">
+            <tr>
+                <th>Marca</th>
+                <th>Modelo</th>
+                <th>Quantidade de Reparações</th>
+            </tr>
+            {lista_marcas_modelos}
+        </table>
+        <p><a href="index.html">Voltar ao índice</a></p>
+    </body>
+</html>
+'''
+#print(html_marcas_modelos)
+escreve_no_ficheiro("./output/marcas_modelos.html", html_marcas_modelos)
