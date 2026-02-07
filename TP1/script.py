@@ -54,18 +54,19 @@ escreve_no_ficheiro("./output/index.html", indice)
 lista_reparacoes_ordenada = reparacoes["reparacoes"]
 lista_reparacoes_ordenada.sort(key=lambda r: r["data"])
 lista_reparacoes = ""
-for i, reparacao in enumerate(lista_reparacoes_ordenada):
+for reparacao in lista_reparacoes_ordenada:
     marca = reparacao.get("viatura", {}).get("marca", "")
     modelo = reparacao.get("viatura", {}).get("modelo", "")
+    nif = str(reparacao["nif"])
     lista_reparacoes += f'''
             <tr>
                 <td>{reparacao["data"]}</td>
-                <td>{reparacao.get("nif", "")}</td>
-                <td>{reparacao.get("nome", "")}</td>
+                <td>{reparacao["nif"]}</td>
+                <td>{reparacao["nome"]}</td>
                 <td>{marca}</td>
                 <td>{modelo}</td>
                 <td>{reparacao["nr_intervencoes"]}</td>
-                <td><a href="./reparacao/r{i}_{reparacao['data']}.html">Ver detalhes</a></td>
+                <td><a href="./reparacao/{nif}.html">Ver detalhes</a></td>
             </tr>
             '''
 html_reparacoes = f'''
@@ -84,6 +85,7 @@ html_reparacoes = f'''
                 <th>Marca</th>
                 <th>Modelo</th>
                 <th>Número de intervenções</th>
+                <th>Detalhes</th>
             </tr>
             {lista_reparacoes}
         </table>
@@ -101,9 +103,10 @@ reparacoes_info = reparacoes["reparacoes"]
 criar_pasta("output/reparacao")
 
 lista_reparacoes_info = ""
-for i, reparacao in enumerate(reparacoes_info):
+for reparacao in reparacoes_info:
     marca = reparacao.get("viatura", {}).get("marca", "")
     modelo = reparacao.get("viatura", {}).get("modelo", "")
+    nif = str(reparacao["nif"])
     intervencoes_info = ""
     for intervencao in reparacao.get("intervencoes", []):
         intervencoes_info += f'''
@@ -128,11 +131,11 @@ for i, reparacao in enumerate(reparacoes_info):
             </tr>
             <tr>
                 <td>NIF</td>
-                <td>{reparacao.get("nif", "")}</td>
+                <td>{reparacao["nif"]}</td>
             </tr>
             <tr>
                 <td>Nome</td>
-                <td>{reparacao.get("nome", "")}</td>
+                <td>{reparacao["nome"]}</td>
             </tr>
             <tr>
                 <td>Marca</td>
@@ -161,4 +164,4 @@ for i, reparacao in enumerate(reparacoes_info):
 </html>
     '''
     print(html_reparacao_info)
-    escreve_no_ficheiro(f"./output/reparacao/r{i}_{reparacao['data']}.html", html_reparacao_info)
+    escreve_no_ficheiro(f"./output/reparacao/{nif}.html", html_reparacao_info)
