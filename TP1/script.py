@@ -55,8 +55,8 @@ lista_reparacoes_ordenada = reparacoes["reparacoes"]
 lista_reparacoes_ordenada.sort(key=lambda r: r["data"])
 lista_reparacoes = ""
 for reparacao in lista_reparacoes_ordenada:
-    marca = reparacao.get("viatura", {}).get("marca", "")
-    modelo = reparacao.get("viatura", {}).get("modelo", "")
+    marca = reparacao["viatura"]["marca"]
+    modelo = reparacao["viatura"]["modelo"]
     nif = str(reparacao["nif"])
     lista_reparacoes += f'''
             <tr>
@@ -104,11 +104,11 @@ criar_pasta("output/reparacao")
 
 lista_reparacoes_info = ""
 for reparacao in reparacoes_info:
-    marca = reparacao.get("viatura", {}).get("marca", "")
-    modelo = reparacao.get("viatura", {}).get("modelo", "")
+    marca = reparacao["viatura"]["marca"]
+    modelo = reparacao["viatura"]["modelo"]
     nif = str(reparacao["nif"])
     intervencoes_info = ""
-    for intervencao in reparacao.get("intervencoes", []):
+    for intervencao in reparacao["intervencoes"]:
         intervencoes_info += f'''
             <tr>
                 <td>{intervencao["codigo"]}</td>
@@ -170,8 +170,8 @@ for reparacao in reparacoes_info:
 
 intervencoes_por_codigo = {}
 for reparacao in reparacoes["reparacoes"]:
-    for intervencao in reparacao.get("intervencoes", []):
-        codigo = intervencao.get("codigo")
+    for intervencao in reparacao["intervencoes"]:
+        codigo = intervencao["codigo"]
         if codigo not in intervencoes_por_codigo:
             intervencoes_por_codigo[codigo] = intervencao
 
@@ -271,14 +271,19 @@ for intervencao in intervencoes_ordenadas:
 #------------------- Listagem das marcas e modelos dos carros intervencionados -------------------------------
 
 contagem = {}
+reparacoes_por_marca_modelo = {}
 
+#Contar o número de reparações por marca e modelo e organizar as reparações por marca e modelo
 for reparacao in reparacoes["reparacoes"]:
-    marca = reparacao.get("viatura", {}).get("marca", "")
-    modelo = reparacao.get("viatura", {}).get("modelo", "")
+    marca = reparacao["viatura"]["marca"]
+    modelo = reparacao["viatura"]["modelo"]
     chave = (marca, modelo)
     if chave not in contagem:
         contagem[chave] = 0
     contagem[chave] += 1
+    if chave not in reparacoes_por_marca_modelo:
+        reparacoes_por_marca_modelo[chave] = []
+    reparacoes_por_marca_modelo[chave].append(reparacao)
 
 lista_marcas_modelos = ""
 
@@ -288,11 +293,13 @@ lista_ordenada_alfabeticamente = sorted(
 )
 
 for (marca, modelo), quantidade in lista_ordenada_alfabeticamente:
+    nome_ficheiro = f"{marca}_{modelo}".replace(" ", "_").replace("/", "_").replace("\\", "_")
     lista_marcas_modelos += f'''
             <tr>
                 <td>{marca}</td>
                 <td>{modelo}</td>
                 <td>{quantidade}</td>
+                <td><a href="./marca_modelo/{nome_ficheiro}.html">Ver detalhes</a></td>
             </tr>
             '''
 
@@ -309,6 +316,7 @@ html_marcas_modelos = f'''
                 <th>Marca</th>
                 <th>Modelo</th>
                 <th>Quantidade de Reparações</th>
+                <th>Detalhes</th>
             </tr>
             {lista_marcas_modelos}
         </table>
@@ -318,3 +326,64 @@ html_marcas_modelos = f'''
 '''
 #print(html_marcas_modelos)
 escreve_no_ficheiro("./output/marcas_modelos.html", html_marcas_modelos)
+
+#------------------- Página de uma marca/modelo -------------------------------
+
+criar_pasta("output/marca_modelo")
+
+for (marca, modelo), quantidade in lista_ordenada_alfabeticamente:
+    nome_ficheiro = f"{marca}_{modelo}".replace(" ", "_").replace("/", "_").replace("\\", "_")
+    lista_reps = ""
+
+    for reparacao in reparacoes_por_marca_modelo.get((marca, modelo), []):
+        lista_reps += f'''
+            <tr>
+                <td>{reparacao["data"]}</td>
+                <td>{reparacao["nif"]}</td>
+                <td>{reparacao["nome"]}</td>
+                <td>{reparacao["nr_intervencoes"]}</td>
+                <td><a href="../reparacao/{reparacao["nif"]}.html">Ver detalhes</a></td>
+            </tr>
+        '''
+
+    html_marca_modelo = f'''
+<html>
+    <head>
+        <title>{marca} {modelo}</title>
+        <meta charset="utf-8"/>
+    </head>
+    <body>
+        <h3>{marca} {modelo}</h3>
+        <table border="1">
+            <tr>
+                <td>Marca</td>
+                <td>{marca}</td>
+            </tr>
+            <tr>
+                <td>Modelo</td>
+                <td>{modelo}</td>
+            </tr>
+            <tr>
+                <td>Número de carros intervencionados</td>
+                <td>{quantidade}</td>
+            </tr>
+        </table>
+
+        <h4>Reparações deste marca/modelo</h4>
+        <table border="1">
+            <tr>
+                <th>Data</th>
+                <th>NIF</th>
+                <th>Nome</th>
+                <th>Nº intervenções</th>
+                <th>Detalhes</th>
+            </tr>
+            {lista_reps}
+        </table>
+
+        <p><a href="../marcas_modelos.html">Voltar à lista de marcas/modelos</a></p>
+        <p><a href="../index.html">Voltar ao índice</a></p>
+    </body>
+</html>
+'''
+    escreve_no_ficheiro(f"./output/marca_modelo/{nome_ficheiro}.html", html_marca_modelo)
