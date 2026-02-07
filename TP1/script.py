@@ -293,13 +293,12 @@ lista_ordenada_alfabeticamente = sorted(
 )
 
 for (marca, modelo), quantidade in lista_ordenada_alfabeticamente:
-    nome_ficheiro = f"{marca}_{modelo}".replace(" ", "_").replace("/", "_").replace("\\", "_")
     lista_marcas_modelos += f'''
             <tr>
                 <td>{marca}</td>
                 <td>{modelo}</td>
                 <td>{quantidade}</td>
-                <td><a href="./marca_modelo/{nome_ficheiro}.html">Ver detalhes</a></td>
+                <td><a href="./marca_modelo/{modelo}.html">Ver detalhes</a></td>
             </tr>
             '''
 
@@ -332,7 +331,6 @@ escreve_no_ficheiro("./output/marcas_modelos.html", html_marcas_modelos)
 criar_pasta("output/marca_modelo")
 
 for (marca, modelo), quantidade in lista_ordenada_alfabeticamente:
-    nome_ficheiro = f"{marca}_{modelo}".replace(" ", "_").replace("/", "_").replace("\\", "_")
     lista_reps = ""
 
     for reparacao in reparacoes_por_marca_modelo.get((marca, modelo), []):
@@ -386,4 +384,4 @@ for (marca, modelo), quantidade in lista_ordenada_alfabeticamente:
     </body>
 </html>
 '''
-    escreve_no_ficheiro(f"./output/marca_modelo/{nome_ficheiro}.html", html_marca_modelo)
+    escreve_no_ficheiro(f"./output/marca_modelo/{modelo}.html", html_marca_modelo)
