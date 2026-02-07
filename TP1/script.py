@@ -298,7 +298,7 @@ for (marca, modelo), quantidade in lista_ordenada_alfabeticamente:
                 <td>{marca}</td>
                 <td>{modelo}</td>
                 <td>{quantidade}</td>
-                <td><a href="./marca_modelo/{modelo}.html">Ver detalhes</a></td>
+                <td><a href="./marca_modelo/{marca}_{modelo}.html">Ver detalhes</a></td>
             </tr>
             '''
 
@@ -384,4 +384,4 @@ for (marca, modelo), quantidade in lista_ordenada_alfabeticamente:
     </body>
 </html>
 '''
-    escreve_no_ficheiro(f"./output/marca_modelo/{modelo}.html", html_marca_modelo)
+    escreve_no_ficheiro(f"./output/marca_modelo/{marca}_{modelo}.html", html_marca_modelo)
