@@ -93,10 +93,10 @@ html_reparacoes = f'''
     </body>
 </html>
 '''
-print(html_reparacoes)
+#print(html_reparacoes)
 escreve_no_ficheiro("./output/reparacoes.html", html_reparacoes)
 
-#---------------------Página de uma reparação individual
+#---------------------Página de uma reparação individual ------------------------------
 
 reparacoes_info = reparacoes["reparacoes"]
 
@@ -163,5 +163,109 @@ for reparacao in reparacoes_info:
     </body>
 </html>
     '''
-    print(html_reparacao_info)
+    #print(html_reparacao_info)
     escreve_no_ficheiro(f"./output/reparacao/{nif}.html", html_reparacao_info)
+
+#------------------- Listagem dos tipos de intervenção -------------------------------
+
+intervencoes_por_codigo = {}
+for reparacao in reparacoes["reparacoes"]:
+    for intervencao in reparacao.get("intervencoes", []):
+        codigo = intervencao.get("codigo")
+        if codigo not in intervencoes_por_codigo:
+            intervencoes_por_codigo[codigo] = intervencao
+
+intervencoes_ordenadas = sorted(intervencoes_por_codigo.values(), key=lambda i: i["codigo"])
+lista_intervencoes = ""
+
+for intervencao in intervencoes_ordenadas:
+    lista_intervencoes += f'''
+            <tr>
+                <td>{intervencao["codigo"]}</td>
+                <td>{intervencao["nome"]}</td>
+                <td>{intervencao["descricao"]}</td>
+                <td> <a href="./intervencao/{intervencao['codigo']}.html">Ver detalhes</a></td>
+            </tr>
+            '''
+html_intervencoes = f'''
+<html>
+    <head>
+        <title>Tipos de Intervenção</title>
+        <meta charset="utf-8"/>
+    </head>
+    <body>
+        <h3>Tipos de Intervenção</h3>
+        <table border="1">
+            <tr>
+                <th>Código</th>
+                <th>Nome</th>
+                <th>Descrição</th>
+                <th>Detalhes</th>
+            </tr>
+            {lista_intervencoes}
+        </table>
+        <p><a href="index.html">Voltar ao índice</a></p>
+    </body>
+</html>
+'''
+#print(html_intervencoes)
+escreve_no_ficheiro("./output/intervencoes.html", html_intervencoes)
+
+#------------------- Página de um tipo de intervenção -------------------------------
+
+reparacoes_info = reparacoes["reparacoes"]
+
+criar_pasta("output/intervencao")
+#Reparações que incluem esta intervenção
+for intervencao in intervencoes_ordenadas:
+    reparacoes_com_intervencao = []
+    for reparacao in reparacoes_info:
+        intervencoes_na_reparacao = list(filter(lambda i: i["codigo"] == intervencao["codigo"], reparacao.get("intervencoes", [])))
+        if intervencoes_na_reparacao:
+            reparacoes_com_intervencao.append(reparacao)
+#Links para as reparações que incluem esta intervenção
+    links_reparacoes = ""
+    for reparacao in reparacoes_com_intervencao:
+        marca = reparacao.get("viatura", {}).get("marca", "")
+        modelo = reparacao.get("viatura", {}).get("modelo", "")
+        nif = str(reparacao["nif"])
+        links_reparacoes += f'''
+            <li>
+                <a href="../reparacao/{nif}.html">{reparacao["nome"]} - {marca} {modelo}</a>
+            </li>
+            '''
+
+    html_intervencao = f'''
+<html>
+    <head>
+        <title>Intervenção {intervencao['codigo']}</title>
+        <meta charset="utf-8"/>
+    </head>
+    <body>
+        <h3>Intervenção {intervencao['codigo']}</h3>
+        <table border="1">
+            <tr>
+                <td>Código</td>
+                <td>{intervencao['codigo']}</td>
+            </tr>
+            <tr>
+                <td>Nome</td>
+                <td>{intervencao['nome']}</td>
+            </tr>
+            <tr>
+                <td>Descrição</td>
+                <td>{intervencao['descricao']}</td>
+            </tr>
+        </table>
+        <h4>Reparações que incluem esta intervenção</h4>
+        <ul>
+            {links_reparacoes}
+        </ul>
+        <p><a href="../intervencoes.html">Voltar à lista de intervenções</a></p>
+        <p><a href="../index.html">Voltar ao índice</a></p>
+    </body>
+</html>
+'''
+    escreve_no_ficheiro(f"./output/intervencao/{intervencao['codigo']}.html", html_intervencao)
+
+#------------------- Listagem das marcas e modelos dos carros intervencionados -------------------------------
