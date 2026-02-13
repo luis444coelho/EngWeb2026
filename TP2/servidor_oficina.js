@@ -9,6 +9,7 @@ http.createServer(function (req, res) {
                                 <th>Nome</th>
                                 <th>NIF</th>
                                 <th>Data</th>
+                                <th>Nr Intervencoes</th>
                             </tr>
                         `
                 dados = resp.data;
@@ -17,6 +18,7 @@ http.createServer(function (req, res) {
                                 <td>${a.nome}</td>
                                 <td>${a.nif}</td>
                                 <td>${a.data}</td>
+                                <td>${a.nr_intervencoes}</td>
                             </tr>`
                 });
                 html += `</table>`
@@ -29,32 +31,72 @@ http.createServer(function (req, res) {
         });  
     }else if(req.url == "/intervencoes"){
             axios.get('http://localhost:3000/reparacoes').then(resp => {
-                html = `<table border = "1">
-                            <tr>
-                            <th>Código</th>
-                            <th>Nome</th>
-                            <th>Descrição</th>
-                            <th>Nr Intervencoes</th>
-                            </tr>
-                        `
-                dados = resp.data;
-                dados.forEach(reparacao => {
-                    reparacao.intervencoes.forEach(intervencao => {
-                        html += `<tr>
-                                    <td>${intervencao.codigo}</td>
-                                    <td>${intervencao.nome}</td>
-                                    <td>${intervencao.descricao}</td>
-                                    <td>${reparacao.nr_intervencoes}</td>
-                                </tr>`
-                    });
-                });
-                html += `</table>`
-                res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
-                res.end(html)
+                
+                const intervencoesMap = new Map();
+
+                for (const reparacao of resp.data) {
+                    for (const intervencao of reparacao.intervencoes) {
+                        if (intervencoesMap.has(intervencao.codigo)) {
+                            intervencoesMap.get(intervencao.codigo).count++;
+                        } else {
+                            intervencoesMap.set(intervencao.codigo, {
+                                nome: intervencao.nome,
+                                descricao: intervencao.descricao,
+                                count: 1
+                            });
+                        }
+                    }
+                }
+                let html = `<table border="1">
+                    <tr>
+                        <th>Código</th>
+                        <th>Nome</th>
+                        <th>Descrição</th>
+                        <th>Nr Intervencoes</th>
+                    </tr>
+
+                `;
+                const mapOrdenado = new Map([...intervencoesMap.entries()].sort((a, b) => a[0].localeCompare(b[0])));
+                for (const [codigo, info] of mapOrdenado) {
+                    html += `<tr>
+                        <td>${codigo}</td>
+                        <td>${info.nome}</td>
+                        <td>${info.descricao}</td>
+                        <td>${info.count}</td>
+                    </tr>`;
+                }
+                html += `</table>`;
+                res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'});
+                res.end(html);
             }).catch(error => {
                 res.writeHead(520, {'Content-Type': 'text/html; charset=utf-8'})
                 res.end("<pre>" + JSON.stringify(error) + "</pre>")
             }); 
+    }else if(req.url == "/viatura"){
+        axios.get('http://localhost:3000/reparacoes').then(resp => {
+            html = `<table border="1">
+                        <tr>
+                            <th>Matricula</th>
+                            <th>Marca</th>
+                            <th>Modelo</th>
+                        </tr>
+                    `
+            dados = resp.data;
+            dados.forEach(reparacao => {
+                html += `<tr>
+                            <td>${reparacao.viatura.matricula}</td>
+                            <td>${reparacao.viatura.marca}</td>
+                            <td>${reparacao.viatura.modelo}</td>
+                        </tr>`
+            });
+        html += `</table>`
+        res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
+        res.end(html)
+        })
+        .catch(error => {
+            res.writeHead(520, {'Content-Type': 'text/html; charset=utf-8'})
+            res.end("<pre>" + JSON.stringify(error) + "</pre>")
+        });  
     }else{
         res.writeHead(520, {'Content-Type': 'text/html; charset=utf-8'})
         res.end("<p>Pedido não encontrado</p>")
