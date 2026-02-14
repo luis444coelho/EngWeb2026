@@ -47,7 +47,7 @@ http.createServer(function (req, res) {
                         }
                     }
                 }
-                let html = `<table border="1">
+                html = `<table border="1">
                     <tr>
                         <th>Código</th>
                         <th>Nome</th>
@@ -72,13 +72,26 @@ http.createServer(function (req, res) {
                 res.writeHead(520, {'Content-Type': 'text/html; charset=utf-8'})
                 res.end("<pre>" + JSON.stringify(error) + "</pre>")
             }); 
-    }else if(req.url == "/viatura"){
+    }else if(req.url == "/viaturas"){
         axios.get('http://localhost:3000/reparacoes').then(resp => {
+
+            const modelosMap = new Map();
+
+            for (const reparacao of resp.data){
+                modelo = reparacao.viatura.modelo;
+                if (modelosMap.has(modelo)){
+                    modelosMap.get(modelo).count++;
+                }else{
+                    modelosMap.set(modelo,{count : 1});
+                }
+            }
+
             html = `<table border="1">
                         <tr>
                             <th>Matricula</th>
                             <th>Marca</th>
                             <th>Modelo</th>
+                            <th>Nr Reparações</th>
                         </tr>
                     `
             dados = resp.data;
@@ -87,6 +100,7 @@ http.createServer(function (req, res) {
                             <td>${reparacao.viatura.matricula}</td>
                             <td>${reparacao.viatura.marca}</td>
                             <td>${reparacao.viatura.modelo}</td>
+                            <td>${modelosMap.get(reparacao.viatura.modelo).count}</td>
                         </tr>`
             });
         html += `</table>`
