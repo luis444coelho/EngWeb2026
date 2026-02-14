@@ -9,18 +9,24 @@ http.createServer(function (req, res) {
                                 <th>Nome</th>
                                 <th>NIF</th>
                                 <th>Data</th>
-                                <th>Nr Intervencoes</th>
+                                <th>Nr Intervenções</th>
+                                <th>Matricula</th>
+                                <th>Marca</th>
+                                <th>Modelo</th>
                             </tr>
                         `
                 dados = resp.data;
-                dados.forEach(a => {
-                    html += `<tr>
-                                <td>${a.nome}</td>
-                                <td>${a.nif}</td>
-                                <td>${a.data}</td>
-                                <td>${a.nr_intervencoes}</td>
-                            </tr>`
-                });
+                dados.forEach(reparacao => {
+                        html += `<tr>
+                                    <td>${reparacao.nome}</td>
+                                    <td>${reparacao.nif}</td>
+                                    <td>${reparacao.data}</td>
+                                    <td>${reparacao.nr_intervencoes}</td>
+                                    <td>${reparacao.viatura.matricula}</td>
+                                    <td>${reparacao.viatura.marca}</td>
+                                    <td>${reparacao.viatura.modelo}</td>
+                                </tr>`
+                    });
                 html += `</table>`
             res.writeHead(200, {'Content-Type': 'text/html; charset=utf-8'})
             res.end(html)
