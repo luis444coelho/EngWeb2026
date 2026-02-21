@@ -12,18 +12,35 @@
 
 ## Resumo
 
-Este trabalho consiste na criação de uma aplicação web para consulta de dados de uma oficina automóvel, baseada no dataset `dataset_reparacoes.json`.
+Este trabalho consiste na criação de uma aplicação web para consulta de dados de uma escola de música.
 
-Foi criado um servidor aplicacional em Node.js (`servidor_oficina.js`) que consome um json-server com o dataset das reparações e responde a pedidos HTTP, gerando páginas HTML dinâmicas para consulta dos dados.
+Foi utilizado o dataset `db.json`. A solução foi dividida em 3 componentes:
 
-O servidor responde aos seguintes serviços:
-- `/reparacoes`: Tabela HTML com os dados das reparações.
-- `/intervencoes`: Tabela HTML com os diferentes tipos de intervenção, sem repetições e com os dados de cada intervenção.
-- `/viaturas`: Tabela HTML com os dados dos tipos de viatura intervencionados e o número de vezes que cada modelo foi reparado.
+1. **Servidor de dados (`json-server`)**
+	- Disponibiliza os dados do ficheiro `db.json` na porta `3000`.
 
-Cada endpoint processa os dados do dataset e devolve uma página HTML.
+2. **Servidor API (`escola_musica_api.js`)**
+	- Corre na porta `25000`.
+	- Consome o `json-server` e expõe endpoints REST para a aplicação:
+	  - `GET /alunos`
+	  - `GET /cursos`
+	  - `GET /instrumentos`
+
+3. **Servidor aplicacional (`escola_musica_app.js`)**
+	- Corre na porta `25001`.
+	- Consome a API (`25000`) e gera páginas HTML dinâmicas com W3.CSS.
+
+Foram implementados os serviços pedidos no enunciado:
+- `/alunos` — tabela HTML com os dados de todos os alunos;
+- `/cursos` — tabela HTML com a informação de todos os cursos;
+- `/instrumentos` — tabela HTML com os dados dos vários instrumentos.
+
+Foi também implementada uma **página principal** (`/`) com links para as três listagens.
 
 ## Lista de Resultados
-- `dataset_reparacoes.json` — dataset fornecido
-- `servidor_oficina.js` — servidor Node.js com os endpoints implementados
+- `db.json` — dataset da escola de música
+- `escola_musica_api.js` — servidor API (porta 25000)
+- `escola_musica_app.js` — servidor aplicacional HTML (porta 25001)
+- `myUtil.js` — funções auxiliares de HTML e acesso à API
+- `package.json` — dependências do projeto
 
