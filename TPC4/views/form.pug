@@ -9,45 +9,50 @@ block content
       if atleta
         input(type="hidden" name="id" value=atleta.id)
 
-      label.w3-text-grey Primeiro Nome
-      input.w3-input.w3-round(type="text" name="primeiro" value=atleta ? atleta.nome.primeiro : "" required)
+      fieldset
+        legend Identificação
+        label.w3-text-grey Primeiro Nome
+        input.w3-input.w3-round(type="text" name="primeiro" value=atleta ? atleta.nome.primeiro : "" required)
 
-      label.w3-text-grey Último Nome
-      input.w3-input.w3-round(type="text" name="ultimo" value=atleta ? atleta.nome['último'] : "" required)
+        label.w3-text-grey Último Nome
+        input.w3-input.w3-round(type="text" name="ultimo" value=atleta ? atleta.nome['último'] : "" required)
 
-      label.w3-text-grey Data EMD
-      input.w3-input.w3-round(type="date" name="dataEMD" value=atleta ? atleta.dataEMD : "" required)
+        label.w3-text-grey Data EMD
+        input.w3-input.w3-round(type="date" name="dataEMD" value=atleta ? atleta.dataEMD : "" required)
 
-      label.w3-text-grey Idade
-      input.w3-input.w3-round(type="number" name="idade" value=atleta ? atleta.idade : "")
+        label.w3-text-grey Idade
+        input.w3-input.w3-round(type="number" name="idade" value=atleta ? atleta.idade : "")
 
-      label.w3-text-grey Género
-      select.w3-select.w3-round(name="genero")
-        option(value="M" selected=atleta && atleta['género'] == 'M') M
-        option(value="F" selected=atleta && atleta['género'] == 'F') F
+        label.w3-text-grey Género
+        select.w3-select.w3-round(name="genero")
+          option(value="M" selected=atleta && atleta['género'] == 'M') M
+          option(value="F" selected=atleta && atleta['género'] == 'F') F
 
-      label.w3-text-grey Morada
-      input.w3-input.w3-round(type="text" name="morada" value=atleta ? atleta.morada : "")
+        label.w3-text-grey Morada
+        input.w3-input.w3-round(type="text" name="morada" value=atleta ? atleta.morada : "")
 
-      label.w3-text-grey Modalidade
-      input.w3-input.w3-round(type="text" name="modalidade" value=atleta ? atleta.modalidade : "" required)
+      fieldset
+        legend Desporto
+        label.w3-text-grey Modalidade
+        input.w3-input.w3-round(type="text" name="modalidade" value=atleta ? atleta.modalidade : "" required)
 
-      label.w3-text-grey Clube
-      input.w3-input.w3-round(type="text" name="clube" value=atleta ? atleta.clube : "")
+        label.w3-text-grey Clube
+        input.w3-input.w3-round(type="text" name="clube" value=atleta ? atleta.clube : "")
 
-      label.w3-text-grey Email
-      input.w3-input.w3-round(type="email" name="email" value=atleta ? atleta.email : "")
+        label.w3-text-grey Federado
+        select.w3-select.w3-round(name="federado")
+          option(value="true" selected=atleta && atleta.federado) Sim
+          option(value="false" selected=atleta && !atleta.federado) Não
 
-      label.w3-text-grey Federado
-      select.w3-select.w3-round(name="federado")
-        option(value="true" selected=atleta && atleta.federado) Sim
-        option(value="false" selected=atleta && !atleta.federado) Não
+      fieldset
+        legend Resultado
+        label.w3-text-grey Email
+        input.w3-input.w3-round(type="email" name="email" value=atleta ? atleta.email : "")
 
-      label.w3-text-grey Resultado
-      select.w3-select.w3-round(name="resultado")
-        option(value="true" selected=atleta && atleta.resultado) Aprovado
-        option(value="false" selected=atleta && !atleta.resultado) Reprovado
+        label.w3-text-grey Resultado
+        select.w3-select.w3-round(name="resultado")
+          option(value="true" selected=atleta && atleta.resultado) Aprovado
+          option(value="false" selected=atleta && !atleta.resultado) Reprovado
 
-      .w3-margin-top
-        button.w3-btn.w3-purple(type="submit")= atleta ? "Atualizar" : "Inserir"
-        a.w3-btn.w3-grey.w3-margin-left(href="/emd") Cancelar
+      button.w3-btn.w3-purple.w3-margin-top(type="submit")= atleta ? "Atualizar" : "Inserir"
+      a.w3-btn.w3-grey.w3-margin-top.w3-margin-left(href="/emd") Cancelar

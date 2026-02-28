@@ -10,6 +10,27 @@ var templates = require('./template.js')           // Necessario criar e colocar
 var static = require('./static.js')                 // Colocar na mesma pasta
 
 // Aux functions
+function generateId() {
+    return Array.from({length: 24}, () => Math.floor(Math.random() * 16).toString(16)).join('')
+}
+
+function formDataToAtleta(data, id, index) {
+    var atleta = {}
+    if (id !== undefined) atleta.id = id
+    if (index !== undefined) atleta.index = index
+    atleta.dataEMD = data.dataEMD
+    atleta.nome = { primeiro: data.primeiro, 'último': data.ultimo }
+    atleta.idade = parseInt(data.idade) || 0
+    atleta['género'] = data.genero
+    atleta.morada = data.morada || ''
+    atleta.modalidade = data.modalidade
+    atleta.clube = data.clube || ''
+    atleta.email = data.email || ''
+    atleta.federado = data.federado === 'true'
+    atleta.resultado = data.resultado === 'true'
+    return atleta
+}
+
 function collectRequestBodyData(request, callback) {
     if(request.headers['content-type'] === 'application/x-www-form-urlencoded') {
         let body = '';
@@ -51,9 +72,16 @@ var treinosServer = http.createServer((req, res) => {
 
                     axios.get(apiUrl)
                         .then(resp => {
-                            res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'})
-                            res.write(templates.atletasListPage(resp.data, d))
-                            res.end()
+                            try {
+                                var html = templates.atletasListPage(resp.data, d)
+                                res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'})
+                                res.write(html)
+                                res.end()
+                            } catch(err) {
+                                res.writeHead(500, {'Content-Type': 'text/html;charset=utf-8'})
+                                res.write('<p>Erro ao gerar a lista: ' + err + '</p>')
+                                res.end()
+                            }
                         })
                         .catch(erro => {
                             res.writeHead(501, {'Content-Type': 'text/html;charset=utf-8'})
@@ -114,6 +142,78 @@ var treinosServer = http.createServer((req, res) => {
                 }
                 
                 break;
+
+            case "POST":
+                var postUrl = new URL(req.url, 'http://localhost')
+                var postPath = postUrl.pathname
+
+                // POST /emd - inserir novo registo ------------------------------------------
+                if (postPath == '/emd') {
+                    collectRequestBodyData(req, result => {
+                        if (result) {
+                            axios.get('http://localhost:3000/atletas')
+                                .then(existing => {
+                                    var index = existing.data.length
+                                    var id = generateId()
+                                    var atleta = formDataToAtleta(result, id, index)
+                                    return axios.post('http://localhost:3000/atletas', atleta)
+                                })
+                                .then(() => {
+                                    res.writeHead(302, {'Location': '/emd'})
+                                    res.end()
+                                })
+                                .catch(erro => {
+                                    res.writeHead(503, {'Content-Type': 'text/html;charset=utf-8'})
+                                    res.write('<p>Não foi possível inserir o registo</p>')
+                                    res.write('<p>' + erro + '</p>')
+                                    res.end()
+                                })
+                        } else {
+                            res.writeHead(502, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write('<p>Não foi possível obter os dados do body</p>')
+                            res.end()
+                        }
+                    })
+                }
+
+                // POST /emd/:id - atualizar registo existente ----------------------------------
+                else if (/\/emd\/[a-zA-Z0-9]+$/.test(postPath)) {
+                    collectRequestBodyData(req, result => {
+                        if (result) {
+                            var id = postPath.split('/')[2]
+                            axios.get('http://localhost:3000/atletas/' + id)
+                            //Primeiro obtemos o registo existente para garantir que mantemos os campos não editados (como id)
+                            //Depois fazemos um PUT com o objeto resultante da combinação do existente com os novos dados do form
+                            //Isto é necessário porque o form não inclui todos os campos do registo (ex: id, email, etc) e não queremos perder esses dados
+                                .then(existing => {
+                                    var atleta = Object.assign({}, existing.data, formDataToAtleta(result))
+                                    return axios.put('http://localhost:3000/atletas/' + id, atleta)
+                                })
+                                .then(() => {
+                                    res.writeHead(302, {'Location': '/emd'})
+                                    res.end()
+                                })
+                                .catch(erro => {
+                                    res.writeHead(507, {'Content-Type': 'text/html;charset=utf-8'})
+                                    res.write('<p>Não foi possível atualizar o registo</p>')
+                                    res.write('<p>' + erro + '</p>')
+                                    res.end()
+                                })
+                        } else {
+                            res.writeHead(506, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write('<p>Não foi possível obter os dados do body</p>')
+                            res.end()
+                        }
+                    })
+                }
+
+                else {
+                    res.writeHead(400, {'Content-Type': 'text/html;charset=utf-8'})
+                    res.write('<p>POST não suportado: ' + req.url + '</p>')
+                    res.end()
+                }
+                break;
+
             default: 
                 // Outros metodos nao sao suportados
                 res.writeHead(200, {'Content-Type' : 'text/html;charset=utf-8'})
