@@ -116,6 +116,23 @@ var treinosServer = http.createServer((req, res) => {
                         })
                 }
 
+                // GET /emd/apagar/:id --------------------------------------------------
+                else if (/\/emd\/apagar\/[a-zA-Z0-9]+$/.test(pathname)) {
+                    var id = pathname.split('/')[3]
+
+                    axios.delete('http://localhost:3000/atletas/' + id)
+                        .then(() => {
+                            res.writeHead(302, {'Location': '/emd'})
+                            res.end()
+                        })
+                        .catch(erro => {
+                            res.writeHead(501, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write('<p>Não foi possível apagar o registo do atleta</p>')
+                            res.write('<p>' + erro + '</p>')
+                            res.end()
+                        })
+                }
+
                 // GET /emd/:id ---------------------------------------------------------
                 else if (/\/emd\/[a-zA-Z0-9]+$/.test(pathname)) {
                     var id = pathname.split('/')[2]
@@ -136,6 +153,19 @@ var treinosServer = http.createServer((req, res) => {
                         .catch(erro => {
                             res.writeHead(501, {'Content-Type': 'text/html;charset=utf-8'})
                             res.write('<p>Não foi possível obter os detalhes do atleta</p>')
+                            res.write('<p>' + erro + '</p>')
+                            res.end()
+                        })
+                }else if (/\/emd\/apagar\/[a-zA-Z0-9]+$/.test(pathname)) {
+                    var id = pathname.split('/')[3]
+                    axios.delete('http://localhost:3000/atletas/' + id)
+                        .then(() => {
+                            res.writeHead(302, {'Location': '/emd'})
+                            res.end()
+                        })
+                        .catch(erro => {
+                            res.writeHead(501, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write('<p>Não foi possível apagar o registo do atleta</p>')
                             res.write('<p>' + erro + '</p>')
                             res.end()
                         })
