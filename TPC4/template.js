@@ -8,3 +8,5 @@ function renderPug(fileName, data) {
 exports.atletasListPage = (tlist, d) => renderPug('index', { list: tlist, date: d });
 exports.atletasPage = (t) => renderPug('emd', { atleta: t});
 exports.errorPage = (msg, d) => renderPug('error', { message: msg, date: d });
+exports.atletasFormPage = (d) => renderPug('form', { date: d });
+exports.atletasFormEditPage = (t, d) => renderPug('form', { atleta: t, date: d });

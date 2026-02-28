@@ -41,4 +41,6 @@ block content
           td Resultado
           td= atleta.resultado ? "Aprovado" : "Reprovado"
 
-      a.w3-btn.w3-teal.w3-margin-top(href='/') Voltar
+      .w3-margin-top
+        a.w3-btn.w3-teal(href='/emd') Voltar
+        a.w3-btn.w3-purple.w3-margin-left(href=`/emd/editar/${atleta.id}`) Editar

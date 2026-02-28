@@ -63,6 +63,31 @@ var treinosServer = http.createServer((req, res) => {
                         })
                 }
 
+                // GET /emd/registo ----------------------------------------------------
+                else if (pathname == '/emd/registo') {
+                    res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'})
+                    res.write(templates.atletasFormPage(d))
+                    res.end()
+                }
+
+                // GET /emd/editar/:id --------------------------------------------------
+                else if (/\/emd\/editar\/[a-zA-Z0-9]+$/.test(pathname)) {
+                    var id = pathname.split('/')[3]
+
+                    axios.get('http://localhost:3000/atletas/' + id)
+                        .then(resp => {
+                            res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write(templates.atletasFormEditPage(resp.data, d))
+                            res.end()
+                        })
+                        .catch(erro => {
+                            res.writeHead(501, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write('<p>Não foi possível obter o registo do atleta</p>')
+                            res.write('<p>' + erro + '</p>')
+                            res.end()
+                        })
+                }
+
                 // GET /emd/:id ---------------------------------------------------------
                 else if (/\/emd\/[a-zA-Z0-9]+$/.test(pathname)) {
                     var id = pathname.split('/')[2]
