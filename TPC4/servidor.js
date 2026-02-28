@@ -4,47 +4,10 @@
 
 var http = require('http')
 var axios = require('axios')
-const { parse } = require('querystring');
 
 var templates = require('./template.js')           // Necessario criar e colocar na mesma pasta
 var static = require('./static.js')                 // Colocar na mesma pasta
-
-// Aux functions
-function generateId() {
-    return Array.from({length: 24}, () => Math.floor(Math.random() * 16).toString(16)).join('')
-}
-
-function formDataToAtleta(data, id, index) {
-    var atleta = {}
-    if (id !== undefined) atleta.id = id
-    if (index !== undefined) atleta.index = index
-    atleta.dataEMD = data.dataEMD
-    atleta.nome = { primeiro: data.primeiro, 'último': data.ultimo }
-    atleta.idade = parseInt(data.idade) || 0
-    atleta['género'] = data.genero
-    atleta.morada = data.morada || ''
-    atleta.modalidade = data.modalidade
-    atleta.clube = data.clube || ''
-    atleta.email = data.email || ''
-    atleta.federado = data.federado === 'true'
-    atleta.resultado = data.resultado === 'true'
-    return atleta
-}
-
-function collectRequestBodyData(request, callback) {
-    if(request.headers['content-type'] === 'application/x-www-form-urlencoded') {
-        let body = '';
-        request.on('data', chunk => {
-            body += chunk.toString();
-        });
-        request.on('end', () => {
-            callback(parse(body));
-        });
-    }
-    else {
-        callback(null);
-    }
-}
+var { generateId, countBy, formDataToAtleta, collectRequestBodyData } = require('./myUtils.js')
 
 // Server creation
 
@@ -96,6 +59,30 @@ var treinosServer = http.createServer((req, res) => {
                     res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'})
                     res.write(templates.atletasFormPage(d))
                     res.end()
+                }
+
+                // GET /emd/stats ------------------------------------------------------
+                else if (pathname == '/emd/stats') {
+                    axios.get('http://localhost:3000/atletas')
+                        .then(resp => {
+                            var atletas = resp.data
+                            var stats = {
+                                sexo:       countBy(atletas, a => a['género']),
+                                modalidade: countBy(atletas, a => a.modalidade),
+                                clube:      countBy(atletas, a => a.clube),
+                                resultado:  countBy(atletas, a => a.resultado ? 'Aprovado' : 'Reprovado'),
+                                federado:   countBy(atletas, a => a.federado ? 'Federado' : 'Não federado')
+                            }
+                            res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write(templates.statsPage(stats, d))
+                            res.end()
+                        })
+                        .catch(erro => {
+                            res.writeHead(501, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write('<p>Não foi possível obter as estatísticas</p>')
+                            res.write('<p>' + erro + '</p>')
+                            res.end()
+                        })
                 }
 
                 // GET /emd/editar/:id --------------------------------------------------
@@ -156,6 +143,7 @@ var treinosServer = http.createServer((req, res) => {
                             res.write('<p>' + erro + '</p>')
                             res.end()
                         })
+                // GET /emd/apagar/:id ---------------------------------------------------------
                 }else if (/\/emd\/apagar\/[a-zA-Z0-9]+$/.test(pathname)) {
                     var id = pathname.split('/')[3]
                     axios.delete('http://localhost:3000/atletas/' + id)
@@ -169,8 +157,32 @@ var treinosServer = http.createServer((req, res) => {
                             res.write('<p>' + erro + '</p>')
                             res.end()
                         })
+                //GET /emd/stats ---------------------------------------------------------
+                }else if(pathname == '/emd/stats') {
+                    axios.get('http://localhost:3000/atletas')
+                        .then(resp => {
+                            var atletas = resp.data
+                            var total = atletas.length
+                            var aprovados = atletas.filter(a => a.resultado).length
+                            var reprovados = total - aprovados
+                            var stats = { total, aprovados, reprovados }
+                            res.writeHead(200, {'Content-Type': 'application/json;charset=utf-8'})
+                            res.write(JSON.stringify(stats))
+                            res.end()
+                        })
+                        .catch(erro => {
+                            res.writeHead(501, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write('<p>Não foi possível obter as estatísticas</p>')
+                            res.write('<p>' + erro + '</p>')
+                            res.end()
+                        })
                 }
-                
+
+                else {
+                    res.writeHead(404, {'Content-Type': 'text/html;charset=utf-8'})
+                    res.write('<p>Recurso não encontrado: ' + req.url + '</p>')
+                    res.end()
+                }
                 break;
 
             case "POST":

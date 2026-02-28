@@ -1,0 +1,29 @@
+extends layout
+
+block content
+  .w3-card-4
+    header.w3-container.w3-teal
+      h1 Estatísticas dos EMD
+    
+    .w3-container.w3-padding-16
+      a.w3-btn.w3-teal(href='/emd') ← Voltar à lista
+
+    mixin distTable(title, data)
+      .w3-card.w3-margin-bottom
+        header.w3-container.w3-blue
+          h3= title
+        table.w3-table-all
+          tr
+            th Valor
+            th Total
+          each count, key in data
+            tr
+              td= key
+              td= count
+
+    .w3-container.w3-padding-16
+      +distTable('Distribuição por Sexo', stats.sexo)
+      +distTable('Distribuição por Resultado', stats.resultado)
+      +distTable('Distribuição por Federado', stats.federado)
+      +distTable('Distribuição por Modalidade', stats.modalidade)
+      +distTable('Distribuição por Clube', stats.clube)
