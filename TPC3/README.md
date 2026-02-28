@@ -42,5 +42,4 @@ Foi também implementada uma **página principal** (`/`) com links para as três
 - `escola_musica_api.js` — servidor API (porta 25000)
 - `escola_musica_app.js` — servidor aplicacional HTML (porta 25001)
 - `myUtil.js` — funções auxiliares de HTML e acesso à API
-- `package.json` — dependências do projeto
 

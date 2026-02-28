@@ -1,0 +1,44 @@
+extends layout
+
+block content
+  .w3-card-4
+    header.w3-container.w3-teal
+      h1 Dados do Atleta
+
+    .w3-container
+      table.w3-table-all.w3-margin-top
+        tr
+          th Campo
+          th Valor
+        tr
+          td Nome
+          td= atleta.nome.primeiro + " " + atleta.nome['último']
+        tr
+          td Data EMD
+          td= atleta.dataEMD
+        tr
+          td Idade
+          td= atleta.idade
+        tr
+          td Género
+          td= atleta['género']
+        tr
+          td Morada
+          td= atleta.morada
+        tr
+          td Modalidade
+          td= atleta.modalidade
+        tr
+          td Clube
+          td= atleta.clube
+        tr
+          td Email
+          td= atleta.email
+        tr
+          td Federado
+          td= atleta.federado ? "Sim" : "Não"
+        tr
+          td Resultado
+          td= atleta.resultado ? "Aprovado" : "Reprovado"
+
+      a.w3-btn.w3-teal.w3-margin-top(href='/') Voltar
