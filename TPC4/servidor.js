@@ -38,42 +38,55 @@ var treinosServer = http.createServer((req, res) => {
     }
     else{
         switch(req.method){
-            case "GET": 
-                // GET /atletas ------------------------------------------------------------------
-                if((req.url == '/') || req.url == '/atletas'){
-                    axios.get("http://localhost:3000/atletas?_sort=data")
-                    .then(resp => {
-                        var atletas = resp.data
-                        res.writeHead(200, {'Content-Type' : 'text/html;charset=utf-8'})
-                        res.write(templates.atletasListPage(atletas, d))
-                        res.end()
-                    })
-                    .catch(erro => {
-                        res.writeHead(501, {'Content-Type' : 'text/html;charset=utf-8'})
-                        res.write('<p>Não foi possível obter a lista de alunos</p>')
-                        res.write('<p>' + erro + '</p>')
-                        res.end()
-                    })
-                }
-                // GET /atletas/:id --------------------------------------------------------------
-                if(/\/atletas\/[a-fA-F0-9]+$/.test(req.url)){
-                    var id = req.url.split('/')[2]
-                    axios.get("http://localhost:3000/atletas/" + id)
-                    .then(resp => {
-                        var atleta = resp.data
-                        res.writeHead(200, {'Content-Type' : 'text/html;charset=utf-8'})
-                        res.write(templates.atletasPage(atleta))
-                        res.end()
-                    })
-                    .catch(erro => {
-                        res.writeHead(501, {'Content-Type' : 'text/html;charset=utf-8'})
-                        res.write('<p>Não foi possível obter os detalhes do aluno</p>')
-                        res.write('<p>' + erro + '</p>')
-                        res.end()
-                    })
-                }
-                // GET /atletas/register ---------------------------------------------------------
+            case "GET":
+                var parsedUrl = new URL(req.url, 'http://localhost')
+                var pathname = parsedUrl.pathname
 
+                // GET / ou GET /emd ----------------------------------------------------
+                if (pathname == '/' || pathname == '/emd') {
+                    var sort = parsedUrl.searchParams.get('sort')
+                    var apiUrl = sort == 'nome'
+                        ? 'http://localhost:3000/atletas?_sort=nome.primeiro&_order=asc'
+                        : 'http://localhost:3000/atletas?_sort=dataEMD&_order=desc'
+
+                    axios.get(apiUrl)
+                        .then(resp => {
+                            res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write(templates.atletasListPage(resp.data, d))
+                            res.end()
+                        })
+                        .catch(erro => {
+                            res.writeHead(501, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write('<p>Não foi possível obter a lista de atletas</p>')
+                            res.write('<p>' + erro + '</p>')
+                            res.end()
+                        })
+                }
+
+                // GET /emd/:id ---------------------------------------------------------
+                else if (/\/emd\/[a-zA-Z0-9]+$/.test(pathname)) {
+                    var id = pathname.split('/')[2]
+
+                    axios.get('http://localhost:3000/atletas/' + id)
+                        .then(resp => {
+                            try {
+                                var html = templates.atletasPage(resp.data)
+                                res.writeHead(200, {'Content-Type': 'text/html;charset=utf-8'})
+                                res.write(html)
+                                res.end()
+                            } catch(err) {
+                                res.writeHead(500, {'Content-Type': 'text/html;charset=utf-8'})
+                                res.write('<p>Erro ao gerar a página do atleta: ' + err + '</p>')
+                                res.end()
+                            }
+                        })
+                        .catch(erro => {
+                            res.writeHead(501, {'Content-Type': 'text/html;charset=utf-8'})
+                            res.write('<p>Não foi possível obter os detalhes do atleta</p>')
+                            res.write('<p>' + erro + '</p>')
+                            res.end()
+                        })
+                }
                 
                 break;
             default: 
