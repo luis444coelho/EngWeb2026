@@ -6,7 +6,27 @@ with open("cinema.json", encoding="utf-8") as f:
 
 lista = data["filmes"]
 
-lista = [{"id": random.randint(1, 100000), **a} for a in lista]
+filme_ids = {}
+ator_ids = {}
+
+def get_filme_id(nome):
+    if nome not in filme_ids:
+        filme_ids[nome] = random.randint(1, 100000)
+    return filme_ids[nome]
+
+def get_ator_id(nome):
+    if nome not in ator_ids:
+        ator_ids[nome] = random.randint(1, 100000)
+    return ator_ids[nome]
+
+lista = [
+    {
+        "id": get_filme_id(a.get("titulo", a.get("title", str(i)))),
+        **{k: v for k, v in a.items() if k != "cast"},
+        "cast": [{"id": get_ator_id(nome), "nome": nome} for nome in a.get("cast", [])]
+    }
+    for i, a in enumerate(lista)
+]
 
 res = {"filmes": lista}
 

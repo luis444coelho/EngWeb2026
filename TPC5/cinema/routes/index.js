@@ -21,5 +21,23 @@ router.get('/filmes/:id', function(req, res, next) {
                         })
 })
 
+router.get('/atores', function(req, res, next) {
+  var d = new Date().toISOString().substring(0, 16)
+  axios.get("http://localhost:3000/filmes")
+        .then(resp => { 
+            var filmes = resp.data
+            // Extract all unique actors
+            var atoresMap = {}
+            filmes.forEach(filme => {
+              filme.cast.forEach(ator => {
+                atoresMap[ator.id] = ator
+              })
+            })
+            var atores = Object.values(atoresMap).sort((a, b) => a.nome.localeCompare(b.nome))
+            res.render('atores', { list: atores, date: d });
+        })
+})
+
+
 
 module.exports = router;

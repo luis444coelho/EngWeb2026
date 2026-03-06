@@ -22,7 +22,7 @@ block content
 
       p
         b Elenco:
-        |  #{filme.cast.join(', ')}
+        |  #{filme.cast.map(c => c.nome).join(', ')}
 
       p
         b Géneros:

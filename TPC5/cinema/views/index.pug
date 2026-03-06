@@ -11,7 +11,7 @@ block content
           th Id
           th Título
           th Ano
-          th Elenco
+          th: a(href="/atores" style="color:inherit") Atores
           th Géneros
 
         each e in list
@@ -19,5 +19,5 @@ block content
             td: a(href=`/filmes/${e.id}`)= e.id
             td: a(href=`/filmes/${e.id}`)= e.title
             td= e.year
-            td= e.cast.join(', ')
+            td= e.cast.map(c => c.nome).join(', ')
             td= e.genres.join(', ') 
