@@ -15,9 +15,9 @@ block content
           th Géneros
 
         each e in list
-          tr(onclick=`window.location='/filmes/${e.id}'` style="cursor:pointer")
-            td= e.id
-            td= e.title
+          tr
+            td: a(href=`/filmes/${e.id}`)= e.id
+            td: a(href=`/filmes/${e.id}`)= e.title
             td= e.year
             td= e.cast.join(', ')
             td= e.genres.join(', ') 
