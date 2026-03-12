@@ -7,24 +7,38 @@ services:
     container_name: cinema_mongo
     volumes:
       - mongo_data:/data/db
-    healthcheck:
-      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
+    networks:
+      - cinema-network
 
   api_dados:
     build:
       context: ./api_dados
       dockerfile: Dockerfile
     container_name: cinema_api
-    ports:
-      - "7779:7779"
     environment:
       - MONGO_URL=mongodb://mongodb:27017/cinema
     depends_on:
-      mongodb:
-        condition: service_healthy
+      - mongodb
+    networks:
+      - cinema-network
+
+  interface:
+    build:
+      context: ./interface
+      dockerfile: Dockerfile.interface
+    container_name: cinema_interface
+    ports:
+      - "7780:7780"
+    environment:
+      - API_URL=http://cinema_api:7779
+    depends_on:
+      - api_dados
+    networks:
+      - cinema-network
+
+networks:
+  cinema-network:
+    driver: bridge
 
 volumes:
   mongo_data:

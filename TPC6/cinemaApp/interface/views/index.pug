@@ -1,0 +1,19 @@
+extends layout.pug
+
+block content
+  .w3-container
+    h2 Lista de Exames Médico-Desportivos (#{emds.length})
+    .w3-bar
+      a.w3-button.w3-round-large.w3-teal.w3-margin(href="/emds/stats") Estatísticas
+    table.w3-table-all
+      tr.w3-teal
+        th Id
+        th Data EMD
+        th Nome
+        th Modalidade
+      each e in emds
+        tr
+          td= e._id
+          td= e.dataEMD
+          td= e.nome.primeiro + ' ' + e.nome.último
+          td= e.modalidade
