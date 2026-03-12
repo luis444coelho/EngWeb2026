@@ -1,0 +1,32 @@
+extends layout.pug
+
+block content
+  .w3-container
+    a.w3-button.w3-teal.w3-margin-bottom(href='/filmes') ← Voltar à lista
+    h2= filme.titulo
+    table.w3-table-all.w3-margin-bottom
+      tr
+        th Id
+        td= filme.id
+      tr
+        th Título
+        td= filme.titulo
+      tr
+        th Ano
+        td= filme.ano
+      tr
+        th Géneros
+        td= filme.generos.map(g => g.designacao).join(', ')
+      tr
+        th Nº de Atores
+        td= filme.cast.length
+
+    h3 Elenco
+    table.w3-table-all
+      tr.w3-teal
+        th Id
+        th Nome
+      each a in filme.cast
+        tr
+          td= a.id
+          td= a.nome

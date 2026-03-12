@@ -28,9 +28,9 @@ services:
       dockerfile: Dockerfile.interface
     container_name: cinema_interface
     ports:
-      - "7780:7780"
+      - "7790:7790"
     environment:
-      - API_URL=http://cinema_api:7779
+      - API_URL=http://api_dados:7779
     depends_on:
       - api_dados
     networks:

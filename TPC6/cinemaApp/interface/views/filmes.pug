@@ -1,0 +1,21 @@
+extends layout.pug
+
+block content
+  .w3-container
+    h2 Filmes (#{filmes.length})
+    table.w3-table-all
+      tr.w3-teal
+        th Id
+        th Título
+        th Ano
+        th Nº Atores
+        th Nº Géneros
+      each f in filmes
+        tr
+          td
+            a(href=`/filmes/${f.id}`)= f.id
+          td
+            a(href=`/filmes/${f.id}`)= f.titulo
+          td= f.ano
+          td= f.cast.length
+          td= f.generos.length
