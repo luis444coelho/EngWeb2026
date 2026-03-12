@@ -1,6 +1,5 @@
 #!/bin/bash
-# Importa o JSON para a base de dados emd, coleção emd
-mongoimport --host localhost --db emd --collection emd --type json --file /docker-entrypoint-initdb.d/emd.json --jsonArray
-
-# Cria o índice de texto necessário para o parâmetro ?q= funcionar
-mongosh emd --eval 'db.emd.createIndex({dataEMD: "text", modalidade: "text", nome.primeiro: "text", nome.último: "text", clube: "text", morada :"text"})'
+# Importa as 3 coleções para a base de dados cinema
+mongoimport --host localhost --db cinema --collection filmes  --type json --file /docker-entrypoint-initdb.d/filmes.json  --jsonArray
+mongoimport --host localhost --db cinema --collection atores  --type json --file /docker-entrypoint-initdb.d/atores.json  --jsonArray
+mongoimport --host localhost --db cinema --collection generos --type json --file /docker-entrypoint-initdb.d/generos.json --jsonArray

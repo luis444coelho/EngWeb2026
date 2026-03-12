@@ -1,0 +1,30 @@
+services:
+
+  mongodb:
+    build:
+      context: ./api_dados
+      dockerfile: Dockerfile.mongo
+    container_name: cinema_mongo
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD", "mongosh", "--eval", "db.adminCommand('ping')"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  api_dados:
+    build:
+      context: ./api_dados
+      dockerfile: Dockerfile
+    container_name: cinema_api
+    ports:
+      - "7779:7779"
+    environment:
+      - MONGO_URL=mongodb://mongodb:27017/cinema
+    depends_on:
+      mongodb:
+        condition: service_healthy
+
+volumes:
+  mongo_data:
