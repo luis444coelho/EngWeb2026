@@ -42,4 +42,27 @@ router.get('/atores', (req, res) => {
         });
 });
 
+// GET /atores/:id - página individual do ator
+router.get('/atores/:id', (req, res) => {
+    const d = new Date().toISOString().substring(0, 16);
+    axios.get(`${API_URL}/atores/${req.params.id}`)
+        .then(response => {
+            const ator = response.data;
+            const filmIds = ator.filmes || [];
+            return Promise.all(
+                filmIds.map(fid =>
+                    axios.get(`${API_URL}/filmes/${fid}`)
+                        .then(r => ({ id: r.data.id, nome: r.data.titulo }))
+                        .catch(() => ({ id: fid, nome: '(desconhecido)' }))
+                )
+            ).then(filmes => {
+                ator.filmes = filmes;
+                res.render('ator', { ator, date: d });
+            });
+        })
+        .catch(err => {
+            res.render('error', { error: err, message: 'Erro ao obter ator da API' });
+        });
+});
+
 module.exports = router;

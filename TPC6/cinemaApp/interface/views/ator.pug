@@ -1,0 +1,28 @@
+extends layout.pug
+
+block content
+  .w3-container
+    a.w3-button.w3-teal.w3-margin-bottom(href='/atores') ← Voltar à lista
+    h2= ator.nome
+    table.w3-table-all.w3-margin-bottom
+      tr
+        th Id
+        td= ator.id
+      tr
+        th Nome
+        td= ator.nome
+      tr
+        th Nº de Filmes
+        td= ator.filmes.length
+
+    h3 Filmes
+    table.w3-table-all
+      tr.w3-teal
+        th Id
+        th Nome
+      each f in ator.filmes
+        tr
+          td
+            a(href=`/filmes/${f.id}`)= f.id
+          td
+            a(href=`/filmes/${f.id}`)= f.nome

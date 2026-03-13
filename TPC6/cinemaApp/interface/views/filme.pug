@@ -28,5 +28,7 @@ block content
         th Nome
       each a in filme.cast
         tr
-          td= a.id
-          td= a.nome
+          td
+            a(href=`/atores/${a.id}`)= a.id
+          td
+            a(href=`/atores/${a.id}`)= a.nome
