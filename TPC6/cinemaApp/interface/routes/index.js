@@ -7,7 +7,7 @@ const API_URL = process.env.API_URL || 'http://localhost:7779';
 // Redireciona / para /filmes
 router.get('/', (req, res) => res.redirect('/filmes'));
 
-// GET /filmes - tabela com id, título, ano, nº atores, nº géneros
+// GET /filmes 
 router.get('/filmes', (req, res) => {
     const d = new Date().toISOString().substring(0, 16);
     axios.get(`${API_URL}/filmes`)
@@ -28,6 +28,17 @@ router.get('/filmes/:id', (req, res) => {
         })
         .catch(err => {
             res.render('error', { error: err, message: 'Erro ao obter filme da API' });
+        });
+});
+
+router.get('/atores', (req, res) => {
+    const d = new Date().toISOString().substring(0, 16);
+    axios.get(`${API_URL}/atores`)
+        .then(response => {
+            res.render('atores', { atores: response.data, date: d });
+        })
+        .catch(err => {
+            res.render('error', { error: err, message: 'Erro ao obter atores da API' });
         });
 });
 
