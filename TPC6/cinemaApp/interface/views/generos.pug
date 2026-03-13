@@ -1,0 +1,15 @@
+extends layout.pug
+
+block content
+  .w3-container
+    h2 Generos (#{generos.length})
+    table.w3-table-all
+      tr.w3-teal
+        th Id
+        th Designação
+        th Nº Filmes
+      each g in generos
+        tr
+          td= g.id
+          td= g.designacao
+          td= g.filmes.length

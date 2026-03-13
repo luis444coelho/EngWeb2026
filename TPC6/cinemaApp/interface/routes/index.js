@@ -31,6 +31,7 @@ router.get('/filmes/:id', (req, res) => {
         });
 });
 
+// GET /atores
 router.get('/atores', (req, res) => {
     const d = new Date().toISOString().substring(0, 16);
     axios.get(`${API_URL}/atores`)
@@ -62,6 +63,18 @@ router.get('/atores/:id', (req, res) => {
         })
         .catch(err => {
             res.render('error', { error: err, message: 'Erro ao obter ator da API' });
+        });
+});
+
+// GET /generos
+router.get('/generos', (req, res) => {
+    const d = new Date().toISOString().substring(0, 16);
+    axios.get(`${API_URL}/generos`)
+        .then(response => {
+            res.render('generos', { generos: response.data, date: d });
+        })
+        .catch(err => {
+            res.render('error', { error: err, message: 'Erro ao obter géneros da API' });
         });
 });
 
